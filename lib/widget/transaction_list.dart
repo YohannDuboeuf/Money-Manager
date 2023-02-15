@@ -1,62 +1,100 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
-import '../models/transaction.dart';
 import 'package:intl/intl.dart';
 
-class TransactionList extends StatefulWidget {
-  const TransactionList({Key key}) : super(key: key);
+import '../models/transaction.dart';
 
-  @override
-  State<TransactionList> createState() => _TransactionListState();
-}
+class TransactionList extends StatelessWidget {
+  final List<Transaction> transactions;
+  final Function deleteTransac;
 
-class _TransactionListState extends State<TransactionList> {
-  final List<Transaction> _userTransactions = [
-    Transaction('t1', "Nouvelle chaussure", DateTime.now(), 59.98),
-    Transaction('t2', "Macdo", DateTime.now(), 17.98)
-  ];
+  TransactionList(this.transactions, this.deleteTransac) {}
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: _userTransactions.map((transac) {
-        return Card(
-          child: Row(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 15,
+    return Container(
+      child: transactions.isEmpty
+          ? Column(
+              children: [
+                Text(
+                  'No transactions added yet ',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Color.fromARGB(255, 28, 155, 194),
-                    width: 2,
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  height: 200,
+                  child: Image.asset('assets/images/waiting.png',
+                      fit: BoxFit.cover),
+                ),
+              ],
+            )
+          : ListView.builder(
+              itemBuilder: (ctx, index) {
+                return Card(
+                  child: Row(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 15,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Theme.of(context).primaryColor,
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          '${transactions[index].amount.toStringAsFixed(2)} €',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            transactions[index].title,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          Text(
+                            DateFormat('dd-MM-yyyy')
+                                .format(transactions[index].date),
+                            style: TextStyle(color: Colors.blueGrey),
+                          )
+                        ],
+                      ),
+                      Flexible(
+                        flex: 1,
+                        fit: FlexFit.tight,
+                        child: InkWell(
+                          child: Container(
+                            padding: EdgeInsets.all(15),
+                            alignment: Alignment.centerRight,
+                            child: Icon(Icons.delete),
+                          ),
+                          onTap: () {
+                            deleteTransac(transactions[index].id);
+                          },
+                          onLongPress: () {
+                            return Container(child: Text('Suprression'),
+                            )
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  '${transac.amount} €',
-                  style: TextStyle(
-                      fontSize: 20, color: Color.fromARGB(255, 28, 155, 194)),
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    transac.title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  Text(
-                    DateFormat('dd-MM-yyyy').format(transac.date),
-                    style: TextStyle(color: Colors.blueGrey),
-                  )
-                ],
-              ),
-            ],
-          ),
-        );
-      }).toList(),
+                );
+              },
+              itemCount: transactions.length,
+            ),
     );
   }
 }
