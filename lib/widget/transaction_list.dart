@@ -84,8 +84,9 @@ class TransactionList extends StatelessWidget {
                             deleteTransac(transactions[index].id);
                           },
                           onLongPress: () {
-                            return Container(child: Text('Suprression'),
-                            )
+                            return Container(
+                              child: Text('Suprression'),
+                            );
                           },
                         ),
                       ),
